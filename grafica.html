@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Logístico para la Gestión de Inundaciones</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Modelo Logístico para la Gestión de Inundaciones</h1>
+    <canvas id="logisticModelChart" width="800" height="400"></canvas>
+
+    <script>
+        // Parámetros del modelo logístico
+        const r = 0.02; // Tasa de acumulación (1/día)
+        const K = 150;  // Capacidad máxima del drenaje (m³)
+        const P0 = 60;  // Nivel inicial del agua (m³)
+        const time = []; // Tiempo en días
+        const P = [];    
+
+        // Generar datos
+        for (let t = 0; t <= 30; t += 0.1) {
+            time.push(t.toFixed(1)); // Agregar tiempo
+            const Pt = (K * P0 * Math.exp(r * t)) / (K + P0 * (Math.exp(r * t) - 1));
+            P.push(Pt.toFixed(2)); // Calcular y agregar P(t)
+        }
+
+        // Configuración de la gráfica
+        const ctx = document.getElementById('logisticModelChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: time, // Eje X: tiempo
+                datasets: [{
+                    label: 'Nivel de agua en el drenaje (P)',
+                    data: P, // Eje Y: nivel de agua
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    fill: false,
+                }, {
+                    label: 'Capacidad máxima (K = 150 m³)',
+                    data: Array(time.length).fill(K), // Línea horizontal constante
+                    borderColor: 'red',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo (días)',
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Nivel de agua (m³)',
+                        },
+                        beginAtZero: true,
+                        max: 160, // Un poco más alto que K
+                    },
+                },
+            },
+        });
+    </script>
+</body>
+</html>
